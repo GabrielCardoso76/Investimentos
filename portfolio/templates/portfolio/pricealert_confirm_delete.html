@@ -1,0 +1,15 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Confirmar Cancelamento de Alerta{% endblock %}
+
+{% block content %}
+<h2>Confirmar Cancelamento</h2>
+<hr>
+<p>Você tem certeza que deseja cancelar o alerta para <strong>{{ alert.asset.ticker }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sim, Cancelar Alerta</button>
+    <a href="{% url 'portfolio:pricealert_list' %}" class="btn btn-secondary">Não</a>
+</form>
+{% endblock %}

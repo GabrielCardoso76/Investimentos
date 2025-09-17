@@ -1,0 +1,28 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Criar Alerta de Preço{% endblock %}
+
+{% block content %}
+<h2>Criar Novo Alerta de Preço</h2>
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label for="{{ form.asset.id_for_label }}" class="form-label">{{ form.asset.label }}</label>
+        {{ form.asset }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.condition.id_for_label }}" class="form-label">{{ form.condition.label }}</label>
+        {{ form.condition }}
+    </div>
+    <div class="mb-3">
+        <label for="{{ form.target_price.id_for_label }}" class="form-label">{{ form.target_price.label }}</label>
+        {{ form.target_price }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar Alerta</button>
+    <a href="{% url 'portfolio:pricealert_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

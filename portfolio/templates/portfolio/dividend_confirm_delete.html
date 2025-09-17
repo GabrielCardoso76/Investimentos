@@ -1,0 +1,16 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Confirmar Exclusão de Provento{% endblock %}
+
+{% block content %}
+<h2>Confirmar Exclusão</h2>
+<hr>
+<p>Você tem certeza que deseja excluir o provento de <strong>{{ dividend.asset.ticker }}</strong> recebido em <strong>{{ dividend.date|date:"d/m/Y" }}</strong>?</p>
+<p>Esta ação não pode ser desfeita.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+    <a href="{% url 'portfolio:dividend_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
