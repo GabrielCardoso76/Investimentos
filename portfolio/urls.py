@@ -11,6 +11,7 @@ from .views import (
     PriceAlertListView,
     PriceAlertCreateView,
     PriceAlertDeleteView,
+    AssetCSVImportView,
 )
 
 app_name = 'portfolio'
@@ -18,9 +19,9 @@ app_name = 'portfolio'
 urlpatterns = [
     # Asset URLs
     path('', AssetListView.as_view(), name='asset_list'),
-    path('add/', AssetCreateView.as_view(), name='asset_create'),
-    path('<int:pk>/edit/', AssetUpdateView.as_view(), name='asset_update'),
-    path('<int:pk>/delete/', AssetDeleteView.as_view(), name='asset_delete'),
+    path('assets/add/', AssetCreateView.as_view(), name='asset_create'),
+    path('assets/<int:pk>/edit/', AssetUpdateView.as_view(), name='asset_update'),
+    path('assets/<int:pk>/delete/', AssetDeleteView.as_view(), name='asset_delete'),
 
     # Dividend URLs
     path('dividends/', DividendListView.as_view(), name='dividend_list'),

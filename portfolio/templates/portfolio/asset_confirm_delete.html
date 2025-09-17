@@ -1,16 +1,23 @@
-{% extends 'portfolio/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Confirmar Exclusão{% endblock %}
 
 {% block content %}
-<h2>Confirmar Exclusão</h2>
-<hr>
-<p>Você tem certeza que deseja excluir o ativo <strong>{{ asset.ticker }}</strong>?</p>
-<p>Esta ação não pode ser desfeita.</p>
-
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Sim, Excluir</button>
-    <a href="{% url 'portfolio:asset_list' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Confirmar Exclusão</h2>
+                <hr>
+                <p>Você tem certeza que deseja excluir o ativo <strong>{{ asset.ticker }}</strong>?</p>
+                <p class="text-danger">Esta ação não pode ser desfeita.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                    <a href="{% url 'portfolio:asset_list' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

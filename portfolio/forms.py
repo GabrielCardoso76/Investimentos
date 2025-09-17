@@ -1,5 +1,9 @@
+import csv
 from django import forms
 from .models import Asset, Dividend, PriceAlert
+
+class CSVImportForm(forms.Form):
+    csv_file = forms.FileField(label='Arquivo CSV')
 
 class AssetForm(forms.ModelForm):
     class Meta:

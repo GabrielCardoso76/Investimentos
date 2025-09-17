@@ -1,7 +1,22 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from datetime import date
 
 User = get_user_model()
+
+class PortfolioSnapshot(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='snapshots')
+    date = models.DateField()
+    total_value = models.DecimalField(max_digits=15, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Snapshot da Carteira'
+        verbose_name_plural = 'Snapshots da Carteira'
+        ordering = ['date']
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f'{self.user.username} - {self.date} - R$ {self.total_value}'
 
 class Asset(models.Model):
     class AssetType(models.TextChoices):
@@ -44,7 +59,6 @@ class Dividend(models.Model):
 
     def __str__(self):
         return f'{self.asset.ticker} - {self.date} - R$ {self.amount}'
-
 
 class PriceAlert(models.Model):
     class AlertCondition(models.TextChoices):
