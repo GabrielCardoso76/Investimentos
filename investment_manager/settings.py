@@ -127,6 +127,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Email backend for development (prints emails to console)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@gestordeinvestimentos.com'
 
 # --- Celery Configuration ---
 CELERY_BROKER_URL = 'redis://localhost:6379/0'

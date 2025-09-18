@@ -7,6 +7,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Dashboard da Carteira</h2>
     <div>
+        <a href="{% url 'portfolio:asset_import_csv' %}" class="btn btn-info">Importar CSV</a>
         <a href="{% url 'portfolio:report_pdf' %}" class="btn btn-secondary">Download PDF</a>
         <a href="{% url 'portfolio:asset_create' %}" class="btn btn-primary">Adicionar Ativo</a>
     </div>
@@ -71,6 +72,7 @@
                     <th>Quantidade</th>
                     <th>Preço Médio</th>
                     <th>Preço Atual</th>
+                    <th>Preço Teto</th>
                     <th>Valor Total</th>
                     <th>Rentabilidade (R$)</th>
                     <th>Rentabilidade (%)</th>
@@ -83,7 +85,13 @@
                     <td><strong>{{ asset.ticker }}</strong><br><small class="text-muted">{{ asset.get_asset_type_display }}</small></td>
                     <td>{{ asset.quantity }}</td>
                     <td>{{ asset.average_price|intcomma }}</td>
-                    <td>{{ asset.current_price|intcomma|default:"-" }}</td>
+                    <td>
+                        {{ asset.current_price|intcomma|default:"-" }}
+                        {% if asset.preco_teto and asset.current_price and asset.current_price < asset.preco_teto %}
+                            <span class="badge bg-success">Abaixo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ asset.preco_teto|intcomma|default:"N/A" }}</td>
                     <td>{{ asset.current_total_value|intcomma|default:"-" }}</td>
                     <td>{{ asset.profit_loss|intcomma|default:"-" }}</td>
                     <td>{{ asset.profit_loss_percent|floatformat:2|default:"-" }}%</td>

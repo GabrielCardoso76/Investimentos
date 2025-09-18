@@ -1,6 +1,17 @@
 import csv
 from django import forms
-from .models import Asset, Dividend, PriceAlert
+from .models import Asset, Dividend, PriceAlert, Profile
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['desired_yield']
+        widgets = {
+            'desired_yield': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+        help_texts = {
+            'desired_yield': 'Informe o percentual de dividend yield mínimo que você deseja para seus investimentos. Ex: 6 para 6%.',
+        }
 
 class CSVImportForm(forms.Form):
     csv_file = forms.FileField(label='Arquivo CSV')
@@ -8,13 +19,14 @@ class CSVImportForm(forms.Form):
 class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
-        fields = ['ticker', 'quantity', 'average_price', 'asset_type', 'sector']
+        fields = ['ticker', 'quantity', 'average_price', 'asset_type', 'sector', 'annual_dividend_projection']
         widgets = {
             'ticker': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: PETR4'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
             'average_price': forms.NumberInput(attrs={'class': 'form-control'}),
             'asset_type': forms.Select(attrs={'class': 'form-control'}),
             'sector': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Petróleo'}),
+            'annual_dividend_projection': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 class DividendForm(forms.ModelForm):

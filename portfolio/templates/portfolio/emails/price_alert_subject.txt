@@ -1,0 +1,1 @@
+Alerta de Preço Acionado para {{ alert.asset.ticker }}

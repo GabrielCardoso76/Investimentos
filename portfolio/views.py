@@ -17,8 +17,8 @@ from django.template.loader import render_to_string
 from django.contrib import messages
 from weasyprint import HTML
 
-from .models import Asset, Dividend, PriceAlert, PortfolioSnapshot
-from .forms import AssetForm, DividendForm, PriceAlertForm, CSVImportForm
+from .models import Asset, Dividend, PriceAlert, PortfolioSnapshot, Profile
+from .forms import AssetForm, DividendForm, PriceAlertForm, CSVImportForm, ProfileForm
 from .services import get_market_data
 from .charts import (
     generate_asset_type_pie_chart,
@@ -90,7 +90,16 @@ class AssetListView(LoginRequiredMixin, _PortfolioDataMixin, ListView):
         portfolio_context = self._get_portfolio_context(self.request.user)
         context.update(portfolio_context)
 
+        # Preço Teto Calculation
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        desired_yield = profile.desired_yield
+
         enriched_assets = portfolio_context['assets']
+        for asset in enriched_assets:
+            asset.preco_teto = None
+            if desired_yield > 0 and asset.annual_dividend_projection is not None and asset.annual_dividend_projection > 0:
+                asset.preco_teto = asset.annual_dividend_projection / (desired_yield / 100)
+
         context['asset_type_pie_chart'] = generate_asset_type_pie_chart(enriched_assets)
         context['sector_pie_chart'] = generate_sector_pie_chart(enriched_assets)
         context['profitability_bar_chart'] = generate_profitability_bar_chart(enriched_assets)
@@ -254,4 +263,19 @@ class AssetCSVImportView(LoginRequiredMixin, FormView):
         if created_count > 0:
             messages.success(self.request, f"{created_count} ativos importados/atualizados com sucesso!")
 
+        return super().form_valid(form)
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = Profile
+    form_class = ProfileForm
+    template_name = 'portfolio/profile_form.html'
+    success_url = reverse_lazy('portfolio:asset_list')
+
+    def get_object(self, queryset=None):
+        # Get or create the profile for the current user
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        return profile
+
+    def form_valid(self, form):
+        messages.success(self.request, "Seu perfil foi atualizado com sucesso!")
         return super().form_valid(form)

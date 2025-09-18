@@ -4,6 +4,13 @@ from datetime import date
 
 User = get_user_model()
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    desired_yield = models.DecimalField(max_digits=5, decimal_places=2, default=6.00, verbose_name='Yield Mínimo Desejado (%)')
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+
 class PortfolioSnapshot(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='snapshots')
     date = models.DateField()
@@ -30,6 +37,11 @@ class Asset(models.Model):
     average_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Preço Médio')
     asset_type = models.CharField(max_length=20, choices=AssetType.choices, verbose_name='Tipo de Ativo')
     sector = models.CharField(max_length=50, blank=True, null=True, verbose_name='Setor')
+    annual_dividend_projection = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True,
+        verbose_name='Projeção de Dividendo Anual (R$ por Ação)',
+        help_text='Valor total de dividendos esperado para os próximos 12 meses por cada ação/cota.'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -7,35 +7,32 @@ logger = logging.getLogger(__name__)
 def get_market_data(tickers):
     """
     Busca dados de mercado para uma lista de tickers.
+    Refatorado para usar yf.Ticker individualmente, pois yf.Tickers está instável.
     """
     if not tickers:
         return {}
 
-    yahoo_tickers = [f"{ticker}.SA" for ticker in tickers]
     market_data = {}
+    for ticker in tickers:
+        yahoo_ticker = f"{ticker}.SA"
+        try:
+            ticker_obj = yf.Ticker(yahoo_ticker)
 
-    try:
-        ticker_data = yf.Tickers(yahoo_tickers)
+            # Tenta obter o preço de 'fast_info' (mais rápido)
+            current_price = ticker_obj.fast_info.get('last_price')
 
-        for i, ticker_obj in enumerate(ticker_data.tickers):
-            original_ticker = tickers[i]
-            try:
-                if hasattr(ticker_obj, 'fast_info'):
-                    current_price = ticker_obj.fast_info.get('last_price')
-                    if current_price:
-                        market_data[original_ticker] = {'current_price': Decimal(str(current_price))}
-                    else:
-                        info = ticker_obj.info
-                        if 'previousClose' in info:
-                             market_data[original_ticker] = {'current_price': Decimal(str(info['previousClose']))}
-                        else:
-                            logger.warning(f"Could not get price for ticker: {original_ticker}")
-                else:
-                    logger.warning(f"Invalid ticker object for {original_ticker}. It might not exist.")
-            except Exception as e:
-                logger.error(f"Error processing ticker {original_ticker}: {e}")
-    except Exception as e:
-        logger.error(f"Error calling yfinance API: {e}")
-        return {}
+            # Se não conseguir, tenta o preço de fechamento anterior de 'info' (fallback)
+            if current_price is None:
+                info = ticker_obj.info
+                current_price = info.get('previousClose')
+
+            if current_price is not None:
+                market_data[ticker] = {'current_price': Decimal(str(current_price))}
+            else:
+                logger.warning(f"Não foi possível obter o preço para o ticker: {ticker}")
+
+        except Exception as e:
+            # yfinance pode lançar várias exceções se o ticker não for encontrado ou a API falhar
+            logger.error(f"Erro ao buscar dados para o ticker {ticker}: {e}")
 
     return market_data

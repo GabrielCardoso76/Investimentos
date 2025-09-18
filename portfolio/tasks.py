@@ -1,5 +1,8 @@
 from celery import shared_task
 import logging
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
 from .models import PriceAlert, Asset, PortfolioSnapshot
 from .services import get_market_data
 from decimal import Decimal
@@ -80,8 +83,26 @@ def check_price_alerts():
             alert.status = PriceAlert.AlertStatus.TRIGGERED
             alert.save()
             triggered_count += 1
-            logger.info(f"Alert {alert.id} for {alert.asset.ticker} triggered!")
-            # Email sending logic will be added in a later step
+            logger.info(f"Alert {alert.id} for {alert.asset.ticker} triggered! Sending email...")
+
+            # Send email notification
+            user = alert.user
+            if user.email:
+                context = {
+                    'alert': alert,
+                    'user': user,
+                    'current_price': current_price,
+                }
+                subject = render_to_string('portfolio/emails/price_alert_subject.txt', context).strip()
+                body = render_to_string('portfolio/emails/price_alert_body.txt', context)
+
+                send_mail(
+                    subject=subject,
+                    message=body,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
 
     logger.info(f"Price alert check complete. Triggered {triggered_count} alerts.")
     return f"Checked {len(active_alerts)} alerts, triggered {triggered_count}."
